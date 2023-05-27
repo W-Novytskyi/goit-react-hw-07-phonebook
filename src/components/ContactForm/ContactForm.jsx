@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addContact } from 'redux/contactsSlice';
+import { addContact } from 'redux/operations';
 import {
   ContainerForm,
   Container,
@@ -32,7 +32,7 @@ export default function ContactForm() {
     }
   };
 
-  const handleAddContact = () => {
+  const handleAddContact = async () => {
     if (name !== '' && number !== '') {
       const isNameExists = contactItems.some(
         contact => contact.name.toLowerCase() === name.toLowerCase()
@@ -41,8 +41,12 @@ export default function ContactForm() {
         alert(`${name} is already in contacts.`);
         return;
       } else {
-        dispatch(addContact(name, number));
-        reset();
+        try {
+          await dispatch(addContact({ name, number })).unwrap();
+          reset();
+        } catch (error) {
+          console.log('Error adding contact:', error);
+        }
       }
     }
   };
